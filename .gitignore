@@ -1,0 +1,5 @@
+.qodo
+__pycache__
+air_quality_venv
+.env
+logs

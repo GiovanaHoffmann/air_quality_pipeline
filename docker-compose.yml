@@ -1,0 +1,32 @@
+version: '3.8'
+services:
+  db:
+    image: postgres:latest
+    container_name: air_quality_db
+    restart: always
+    environment:
+      POSTGRES_DB: air_quality
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  airflow:
+    image: apache/airflow:latest
+    container_name: air_quality_airflow
+    depends_on:
+      - db
+    environment:
+      AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://postgres:secret@db:5432/air_quality
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+      - ./logs:/opt/airflow/logs
+    ports:
+      - "8080:8080"
+    command: airflow standalone
+
+volumes:
+  pgdata:
