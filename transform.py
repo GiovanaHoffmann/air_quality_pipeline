@@ -1,5 +1,6 @@
 import pandas as pd
 import logging
+from datetime import datetime, timezone
 
 # Configuração de logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
@@ -12,15 +13,22 @@ def transform_data(data_list):
     records = []
     for data in data_list:
         if not data or "list" not in data:
-            logging.error(f"Dados incompletos para {data.get('city', 'cidade desconhecida')}.")
+            logging.error(f"Dados incompletos para {data.get('city', 'cidade desconhecida')}")
             continue
 
         for entry in data["list"]:
+            # Converter timestamp Unix para datetime com timezone UTC
+            dt_object = datetime.fromtimestamp(entry["dt"], tz=timezone.utc)
+            date_str = dt_object.strftime('%Y-%m-%d')
+            time_str = dt_object.strftime('%H:%M:%S')
+            
             record = {
                 "city": data["city"],
                 "latitude": data["coord"]["lat"],
                 "longitude": data["coord"]["lon"],
-                "date_time": entry["dt"],
+                "date": date_str,
+                "time": time_str,
+                "date_time_unix": entry["dt"],
                 "air_quality_index": entry["main"]["aqi"],
                 "carbon_monoxide": entry["components"]["co"],
                 "nitrogen_monoxide": entry["components"]["no"],

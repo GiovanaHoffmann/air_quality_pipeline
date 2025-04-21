@@ -39,7 +39,7 @@ CAPITALS = {
     "São Paulo": (-23.5505, -46.6333),
     "Aracaju": (-10.9472, -37.0731),
     "Palmas": (-10.2491, -48.3243),
-}
+}          
 
 def fetch_data():
     all_data = []
