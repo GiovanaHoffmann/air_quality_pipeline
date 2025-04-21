@@ -1,9 +1,10 @@
-version: '3.8'
 services:
   db:
     image: postgres:latest
     container_name: air_quality_db
     restart: always
+    env_file:
+      - .env 
     environment:
       POSTGRES_DB: air_quality
       POSTGRES_USER: ${DB_USER}
@@ -18,15 +19,26 @@ services:
     container_name: air_quality_airflow
     depends_on:
       - db
+    env_file:
+      - .env 
     environment:
-      AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://postgres:secret@db:5432/air_quality
+      AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}
       AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
+      #PYTHONPATH: /opt 
     volumes:
       - ./airflow/dags:/opt/airflow/dags
       - ./logs:/opt/airflow/logs
+      - .:/opt/ 
     ports:
       - "8080:8080"
-    command: airflow standalone
+    command: >
+      bash -c "
+      airflow db init &&
+      airflow users create --username admin --firstname Admin --lastname User --role Admin --email admin@example.com --password admin &&
+      airflow users create --username usuario --firstname Novo --lastname Usuario --role Admin --email usuario@example.com --password senha &&
+      (airflow webserver & airflow scheduler)
+      "
 
 volumes:
   pgdata:

@@ -15,19 +15,26 @@ for var in REQUIRED_ENV_VARS:
         logging.error(f"Variável de ambiente {var} não definida.")
         raise EnvironmentError(f"Variável de ambiente {var} não definida.")
 
-DB_CONFIG = {
+"""DB_CONFIG = {
     "dbname": os.getenv("DB_NAME"),
     "user": os.getenv("DB_USER"),
     "password": os.getenv("DB_PASSWORD"),
     "host": os.getenv("DB_HOST"),
     "port": os.getenv("DB_PORT"),
-}
+}"""
 
 def get_db_connection():
     try:
-        conn = psycopg2.connect(**DB_CONFIG)
-        logging.info("Conexão com o banco de dados estabelecida com sucesso.")
+        conn = psycopg2.connect(
+            dbname=os.getenv("DB_NAME"),
+            user=os.getenv("DB_USER"),
+            password=os.getenv("DB_PASSWORD"),
+            host="db",  # Nome do serviço no Docker
+            port=os.getenv("DB_PORT")
+        )
+        logging.info(f"Conectado com sucesso ao banco {os.getenv('DB_NAME')} em db:{os.getenv('DB_PORT')}")
+        logging.info(f"Usuário: {os.getenv('DB_USER')}")
         return conn
     except psycopg2.Error as e:
-        logging.error(f"Erro ao conectar ao banco de dados: {e}")
+        logging.error(f"Erro de conexão: {e}")
         return None
