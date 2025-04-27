@@ -1,15 +1,11 @@
-import os
+from utils import setup_logging, load_environment
 import requests
-from dotenv import load_dotenv
-import logging
+import os
 
-load_dotenv()
-
-# Configuração de logging
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+logger = setup_logging()
+load_environment()
 
 API_KEY = os.getenv("API_KEY")
-
 # Coordenadas das capitais brasileiras (latitude, longitude)
 CAPITALS = {
     "Rio Branco": (-9.9747, -67.8100),
@@ -51,7 +47,7 @@ def fetch_data():
             data = response.json()
             data["city"] = city  # Adiciona o nome da cidade ao JSON
             all_data.append(data)
-            logging.info(f"Dados para {city} extraídos com sucesso.")
+            logger.info(f"Dados para {city} extraídos com sucesso.")
         except requests.exceptions.RequestException as e:
-            logging.error(f"Erro ao obter dados para {city}: {e}")
+            logger.error(f"Erro ao obter dados para {city}: {e}")
     return all_data

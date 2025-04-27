@@ -1,8 +1,8 @@
 from db import get_db_connection
-import logging
+from utils import setup_logging
 
 # Configuração de logging
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+logger = setup_logging()
 
 def create_table():
     conn = get_db_connection()
@@ -19,6 +19,7 @@ def create_table():
                 longitude FLOAT,
                 date DATE,  -- coluna separada para data
                 time TIME,  -- coluna separada para hora
+                timezone VARCHAR(50),
                 date_time_unix BIGINT,  -- timestamp original
                 air_quality_index INT,
                 carbon_monoxide FLOAT,
@@ -35,16 +36,16 @@ def create_table():
         cur.execute("CREATE INDEX IF NOT EXISTS idx_timestamp ON air_quality (timestamp);")
         cur.execute("CREATE INDEX IF NOT EXISTS idx_date ON air_quality (date);")  # Índice para data
         conn.commit()
-        logging.info("Tabela criada ou verificada com sucesso.")
+        logger.info("Tabela criada ou verificada com sucesso.")
     except Exception as e:
-        logging.error(f"Erro ao criar tabela: {e}")
+        logger.error(f"Erro ao criar tabela: {e}")
     finally:
         cur.close()
         conn.close()
 
 def load_data(df):
     if df is None or df.empty:
-        logging.warning("Nenhum dado para inserir.")
+        logger.warning("Nenhum dado para inserir.")
         return
 
     conn = get_db_connection()
@@ -56,24 +57,24 @@ def load_data(df):
         for _, row in df.iterrows():
             cur.execute("""
                 INSERT INTO air_quality (
-                    city, latitude, longitude, date, time, date_time_unix,
+                    city, latitude, longitude, date, time, timezone, date_time_unix,
                     air_quality_index, carbon_monoxide, nitrogen_monoxide,
                     nitrogen_dioxide, ozone, sulphur_dioxide,
                     fine_particles, coarse_particles, ammonia
-                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
+                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
             """, (
                 row["city"], row["latitude"], row["longitude"],
-                row["date"], row["time"], row["date_time_unix"],
-                row["air_quality_index"], row["carbon_monoxide"],
-                row["nitrogen_monoxide"], row["nitrogen_dioxide"],
-                row["ozone"], row["sulphur_dioxide"],
-                row["fine_particles"], row["coarse_particles"],
-                row["ammonia"]
+                row["date"], row["time"], row.get("timezone", "UTC"), # Usando get() para compatibilidade
+                row["date_time_unix"], row["air_quality_index"], 
+                row["carbon_monoxide"], row["nitrogen_monoxide"], 
+                row["nitrogen_dioxide"], row["ozone"], 
+                row["sulphur_dioxide"], row["fine_particles"], 
+                row["coarse_particles"], row["ammonia"]
             ))
         conn.commit()
-        logging.info("Dados carregados com sucesso.")
+        logger.info("Dados carregados com sucesso.")
     except Exception as e:
-        logging.error(f"Erro ao carregar dados: {e}")
+        logger.error(f"Erro ao carregar dados: {e}")
     finally:
         cur.close()
         conn.close()

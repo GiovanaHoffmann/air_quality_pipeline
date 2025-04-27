@@ -1,27 +1,9 @@
 import os
 import psycopg2
-from dotenv import load_dotenv
-import logging
+from utils import setup_logging, load_environment
 
-load_dotenv()
-
-# Configuração de logging
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
-
-# Validação das variáveis de ambiente
-REQUIRED_ENV_VARS = ["DB_NAME", "DB_USER", "DB_PASSWORD", "DB_HOST", "DB_PORT"]
-for var in REQUIRED_ENV_VARS:
-    if not os.getenv(var):
-        logging.error(f"Variável de ambiente {var} não definida.")
-        raise EnvironmentError(f"Variável de ambiente {var} não definida.")
-
-"""DB_CONFIG = {
-    "dbname": os.getenv("DB_NAME"),
-    "user": os.getenv("DB_USER"),
-    "password": os.getenv("DB_PASSWORD"),
-    "host": os.getenv("DB_HOST"),
-    "port": os.getenv("DB_PORT"),
-}"""
+logger = setup_logging()
+load_environment()
 
 def get_db_connection():
     try:
@@ -29,12 +11,12 @@ def get_db_connection():
             dbname=os.getenv("DB_NAME"),
             user=os.getenv("DB_USER"),
             password=os.getenv("DB_PASSWORD"),
-            host="db",  # Nome do serviço no Docker
+            host=os.getenv("DB_HOST", "db"),  #'db' como fallback para Docker. Pode sobrescrever via .env
             port=os.getenv("DB_PORT")
         )
-        logging.info(f"Conectado com sucesso ao banco {os.getenv('DB_NAME')} em db:{os.getenv('DB_PORT')}")
-        logging.info(f"Usuário: {os.getenv('DB_USER')}")
+        logger.info(f"Conectado ao {os.getenv('DB_NAME')} em {os.getenv('DB_HOST')}:{os.getenv('DB_PORT')}")
+        logger.info(f"Usuário: {os.getenv('DB_USER')}")
         return conn
     except psycopg2.Error as e:
-        logging.error(f"Erro de conexão: {e}")
+        logger.error(f"Erro de conexão: {e}")
         return None
