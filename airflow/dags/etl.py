@@ -12,27 +12,20 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(
 default_args = {
     'owner': 'airflow',
     'depends_on_past': False,
-    'start_date': datetime(2024, 1, 1),
+    'start_date': datetime.now() - timedelta(hours=1),
     'retries': 1,
     'retry_delay': timedelta(minutes=5),
-    'catchup': False
+    'catchup': False # evita execuções retroativas
 }
 
 dag = DAG(
     'air_quality_etl',
     default_args=default_args,
     schedule_interval='@hourly',
+    max_active_runs=1 # Garante que apenas uma instância da DAG esteja ativa por vez
 )
 
 def run_etl():
-    """
-    try:
-        base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'))
-        main_path = os.path.join(base_dir, 'main.py')
-        subprocess.run(["python3", main_path], check=True)
-    except subprocess.CalledProcessError as e:
-        raise AirflowException(f"Erro ao executar o pipeline: {e}")
-    """
     try:
         subprocess.run(["python", "/opt/main.py"], check=True)
         logging.info("Pipeline executado com sucesso!")
