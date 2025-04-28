@@ -46,7 +46,7 @@ O projeto tem como objetivo monitorar a qualidade do ar em todas as capitais bra
 
 ---
 
-## **📂 Estrutura do Projeto e Arquitetura**
+## **📂 Estrutura do Projeto**
 ```
 air_quality_pipeline/
 │── .env                  # Variáveis de ambiente
