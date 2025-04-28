@@ -10,7 +10,7 @@ Este projeto é um pipeline ETL (Extract, Transform, Load) que coleta dados de q
   - [**🌐 Visão Geral**](#-visão-geral)
   - [**🚀 Funcionalidades**](#-funcionalidades)
   - [**🛠 Tecnologias Utilizadas**](#-tecnologias-utilizadas)
-  - [**📂 Estrutura do Projeto e Arquitetura**](#-estrutura-do-projeto-e-arquitetura)
+  - [**📂 Estrutura do Projeto**](#-estrutura-do-projeto)
   - [**📐 Arquitetura**](#-arquitetura)
   - [**📋 Pré-requisitos**](#-pré-requisitos)
   - [**⚙ Configuração do Ambiente**](#-configuração-do-ambiente)
