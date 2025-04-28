@@ -1,6 +1,6 @@
 # **Projeto: Pipeline de Qualidade do Ar com Apache Airflow**
 
-Este projeto é um pipeline ETL (Extract, Transform, Load) que coleta dados de qualidade do ar de todas as capitais brasileiras usando a API do OpenWeatherMap, transforma os dados e os carrega em um banco de dados PostgreSQL. O pipeline é orquestrado pelo Apache Airflow, permitindo execuções automatizadas e monitoramento.
+Este projeto é um pipeline ETL (Extract, Transform, Load) que coleta dados de qualidade do ar de todas as capitais brasileiras usando a API do [OpenWeatherMap](https://openweathermap.org/api/air-pollution), transforma os dados e os carrega em um banco de dados PostgreSQL. O pipeline é orquestrado pelo Apache Airflow, permitindo execuções automatizadas e monitoramento.
 
 ---
 
@@ -10,7 +10,8 @@ Este projeto é um pipeline ETL (Extract, Transform, Load) que coleta dados de q
   - [**🌐 Visão Geral**](#-visão-geral)
   - [**🚀 Funcionalidades**](#-funcionalidades)
   - [**🛠 Tecnologias Utilizadas**](#-tecnologias-utilizadas)
-  - [**📂 Estrutura do Projeto**](#-estrutura-do-projeto)
+  - [**📂 Estrutura do Projeto e Arquitetura**](#-estrutura-do-projeto-e-arquitetura)
+  - [**📐 Arquitetura**](#-arquitetura)
   - [**📋 Pré-requisitos**](#-pré-requisitos)
   - [**⚙ Configuração do Ambiente**](#-configuração-do-ambiente)
   - [**▶ Executando o Projeto**](#-executando-o-projeto)
@@ -45,7 +46,7 @@ O projeto tem como objetivo monitorar a qualidade do ar em todas as capitais bra
 
 ---
 
-## **📂 Estrutura do Projeto**
+## **📂 Estrutura do Projeto e Arquitetura**
 ```
 air_quality_pipeline/
 │── .env                  # Variáveis de ambiente
@@ -58,12 +59,24 @@ air_quality_pipeline/
 │── transform.py          # Transformação dos dados
 │── load.py               # Carga dos dados no PostgreSQL
 │── db.py                 # Conexão com o PostgreSQL
+│── utils.py              # Configuração do load_dotenv e logging
 │── logs/                 # Arquivos de log
 │── airflow/
 │   └── dags/
 │       └── etl.py        # DAG do Apache Airflow
+|── air_quality_dashboard.pbix
 ```
-
+---
+## **📐 Arquitetura**
+```mermaid
+graph TD
+    A[OpenWeather API] --> B[Extract]
+    B --> C[Transform]
+    C --> D[Load]
+    D --> E[(PostgreSQL)]
+    E --> F[Airflow]
+    F --> G[Visualização]
+```
 ---
 
 ## **📋 Pré-requisitos**
@@ -81,7 +94,7 @@ air_quality_pipeline/
    ```
 
 2. **Crie um arquivo `.env`**:
-   - Renomeie o arquivo `.env.example` para `.env`.
+   - Renomeie o arquivo `.env-example` para `.env`.
    - Adicione sua chave de API do OpenWeatherMap e as credenciais do banco de dados.
 
 3. **Instale as dependências**:
@@ -97,16 +110,26 @@ air_quality_pipeline/
 ---
 
 ## **▶ Executando o Projeto**
-1. **Execute o pipeline manualmente**:
-   ```bash
-   python main.py
-   ```
+   1. Via Airflow (recomendado):
+      - Acesse http://localhost:8080
+      - Ative a DAG air_quality_etl
 
-2. **Acesse o Apache Airflow**:
-   - Abra o navegador e acesse [http://localhost:8080](http://localhost:8080).
-   - A DAG `air_quality_etl` estará disponível para execução.
+   2. Manual:
+      ```bash
+      python main.py
+      ```
 
-3. **Verifique os logs**:
+Acessando os Dados
+   - PGAdmin: http://localhost:5050
+      - Credenciais definidas no .env
+
+   - Consulta Direta:
+      ```sql
+      SELECT city, air_quality_index 
+      FROM air_quality 
+      WHERE date = CURRENT_DATE;
+      ```
+Verifique os logs:
    - Os logs são armazenados na pasta `logs/`.
 
 ---
@@ -120,6 +143,7 @@ air_quality_pipeline/
 - **`load.py`**: Carrega os dados transformados no PostgreSQL.
 - **`db.py`**: Gerencia a conexão com o banco de dados.
 - **`airflow/dags/etl.py`**: Define a DAG do Apache Airflow para orquestrar o pipeline.
+- **`utils.py`**: Contém a configuração do load_dotenv e logging.
 
 ---
 
