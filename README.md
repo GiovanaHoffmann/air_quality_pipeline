@@ -12,6 +12,7 @@ Este projeto é um pipeline ETL (Extract, Transform, Load) que coleta dados de q
   - [**🛠 Tecnologias Utilizadas**](#-tecnologias-utilizadas)
   - [**📂 Estrutura do Projeto**](#-estrutura-do-projeto)
   - [**📐 Arquitetura**](#-arquitetura)
+  - [](#)
   - [**📋 Pré-requisitos**](#-pré-requisitos)
   - [**⚙ Configuração do Ambiente**](#-configuração-do-ambiente)
   - [**▶ Executando o Projeto**](#-executando-o-projeto)
@@ -68,15 +69,7 @@ air_quality_pipeline/
 ```
 ---
 ## **📐 Arquitetura**
-```mermaid
-graph TD
-    A[OpenWeather API] --> B[Extract]
-    B --> C[Transform]
-    C --> D[Load]
-    D --> E[(PostgreSQL)]
-    E --> F[Airflow]
-    F --> G[Visualização]
-```
+![Arquitetura do Projeto](Air_quality_arquitetura.drawio.png)
 ---
 
 ## **📋 Pré-requisitos**
